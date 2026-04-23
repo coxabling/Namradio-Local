@@ -120,3 +120,33 @@ export const TRAINING_RESOURCES: Resource[] = [
     link: 'https://africanmusiclibrary.org/',
   },
 ];
+
+export const RECENTLY_PLAYED: Track[] = [
+  {
+    id: 'rp1',
+    title: 'Water',
+    artistId: 'tyla',
+    artistName: 'Tyla',
+    duration: '3:20',
+    url: 'https://www.youtube.com/watch?v=ecl_17S7y-4',
+    coverUrl: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=1000',
+  },
+  {
+    id: 'rp2',
+    title: 'Higher',
+    artistId: 'tems',
+    artistName: 'Tems',
+    duration: '3:11',
+    url: 'https://www.youtube.com/watch?v=jOp7D0S0nF0',
+    coverUrl: 'https://images.unsplash.com/photo-1514525253361-b83f85df0f5c?q=80&w=1000',
+  },
+  {
+    id: 'rp3',
+    title: 'Last Last',
+    artistId: 'burnaboy',
+    artistName: 'Burna Boy',
+    duration: '2:52',
+    url: 'https://www.youtube.com/watch?v=421w1j87fEM',
+    coverUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000',
+  },
+];

@@ -5,56 +5,140 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
+import { Menu, X, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 
 interface NavbarProps {
   onOpenPortal: () => void;
 }
 
 export function Navbar({ onOpenPortal }: NavbarProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navLinks = [
+    { name: 'Home', href: '#home', icon: Home },
+    { name: 'Artists', href: '#artists', icon: Mic2 },
+    { name: 'Training', href: '#training', icon: GraduationCap },
+    { name: 'About', href: '#about', icon: Info },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass px-6 py-4 flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-          <Radio className="text-black" />
-        </div>
-        <span className="font-bold text-xl tracking-tighter uppercase whitespace-nowrap">
-          Nam Radio <span className="text-primary">Local</span>
-        </span>
-      </div>
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-[60] glass px-6 py-4 flex items-center justify-between border-b border-white/5">
+        <a href="#home" className="flex items-center gap-2 group">
+          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+            <Radio className="text-black" />
+          </div>
+          <span className="font-bold text-xl tracking-tighter uppercase whitespace-nowrap">
+            Nam Radio <span className="text-primary">Local</span>
+          </span>
+        </a>
 
-      <div className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest text-white/70">
-        <a href="#home" className="hover:text-primary transition-colors flex items-center gap-2">
-          <Home size={16} /> Home
-        </a>
-        <a href="#artists" className="hover:text-primary transition-colors flex items-center gap-2">
-          <Mic2 size={16} /> Artists
-        </a>
-        <a href="#training" className="hover:text-primary transition-colors flex items-center gap-2">
-          <GraduationCap size={16} /> Training
-        </a>
-        <a href="#about" className="hover:text-primary transition-colors flex items-center gap-2">
-          <Info size={16} /> About
-        </a>
-      </div>
-
-      <div className="flex items-center gap-4">
-        <button 
-          onClick={onOpenPortal}
-          className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white group"
-        >
-          <User size={20} className="group-hover:text-primary transition-colors" />
-          <span className="text-xs font-bold uppercase tracking-widest hidden sm:inline">Portal</span>
-        </button>
-        <button className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors">
-          <Menu size={20} />
-        </button>
-        <div className="hidden md:flex items-center gap-3 pl-4 border-l border-white/20">
-          <Globe size={18} className="text-secondary" />
-          <span className="text-xs uppercase font-semibold">Africa / Global</span>
+        {/* Desktop Links */}
+        <div className="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
+          {navLinks.map((link) => (
+            <a 
+              key={link.name} 
+              href={link.href} 
+              className="hover:text-primary transition-colors flex items-center gap-2"
+            >
+              <link.icon size={14} /> {link.name}
+            </a>
+          ))}
         </div>
-      </div>
-    </nav>
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button 
+            onClick={onOpenPortal}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white group"
+          >
+            <User size={18} className="group-hover:text-primary transition-colors" />
+            <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">Portal</span>
+          </button>
+          
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          <div className="hidden sm:flex items-center gap-3 pl-4 border-l border-white/20 h-8">
+            <Globe size={16} className="text-secondary" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Africa / Global</span>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-[55] lg:hidden overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-black/98 backdrop-blur-3xl" />
+            
+            {/* Animated decorative blobs */}
+            <motion.div 
+              animate={{ 
+                scale: [1, 1.2, 1],
+                opacity: [0.1, 0.2, 0.1],
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="absolute -top-[20%] -left-[10%] w-[80%] h-[80%] bg-primary rounded-full blur-[120px] pointer-events-none"
+            />
+            <motion.div 
+              animate={{ 
+                scale: [1.2, 1, 1.2],
+                opacity: [0.05, 0.15, 0.05],
+              }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+              className="absolute -bottom-[20%] -right-[10%] w-[80%] h-[80%] bg-secondary rounded-full blur-[120px] pointer-events-none"
+            />
+
+            <div className="absolute inset-0 bg-african-gradient opacity-10" />
+            <div className="absolute inset-0 african-pattern opacity-5" />
+            
+            <div className="absolute inset-0 pt-24 px-6 flex flex-col gap-6 overflow-y-auto">
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] uppercase font-black tracking-[0.3em] text-primary mb-4 p-4">Navigation</span>
+                {navLinks.map((link) => (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors text-2xl font-black uppercase tracking-tighter group"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors">
+                      <link.icon size={24} />
+                    </div>
+                    {link.name}
+                  </a>
+                ))}
+              </div>
+              
+              <div className="mt-auto pb-12 p-4 border-t border-white/5">
+                <div className="flex items-center gap-3 mb-6">
+                  <Globe size={18} className="text-secondary" />
+                  <span className="text-xs uppercase font-bold tracking-widest text-white/40">Broadcasting Globally from Africa</span>
+                </div>
+                <button 
+                  onClick={() => {
+                    onOpenPortal();
+                    setIsMenuOpen(false);
+                  }}
+                  className="w-full btn-primary py-4 text-sm"
+                >
+                  Enter Artist Hub
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -67,11 +151,16 @@ export function RadioPlayer() {
     artist: string;
     art: string;
     genre?: string;
+    listeners?: number;
+    streamer?: string;
+    isLive?: boolean;
   }>({
     title: "Nam Radio Local",
     artist: "Empowering African Artists",
     art: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000",
-    genre: "Variety"
+    genre: "Variety",
+    listeners: 0,
+    isLive: false
   });
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -84,12 +173,16 @@ export function RadioPlayer() {
       const response = await fetch(API_URL);
       if (!response.ok) throw new Error('API request failed');
       const data = await response.json();
+      
       if (data && data.now_playing && data.now_playing.song) {
         setNowPlaying({
           title: data.now_playing.song.title || "Nam Radio Local",
           artist: data.now_playing.song.artist || "African Talents",
           art: data.now_playing.song.art || "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000",
-          genre: data.now_playing.song.genre || "Global Mix"
+          genre: data.now_playing.song.genre || "Global Mix",
+          listeners: data.listeners?.total || 0,
+          streamer: data.live?.streamer_name || "",
+          isLive: data.live?.is_live || false
         });
       }
     } catch (error) {
@@ -102,6 +195,15 @@ export function RadioPlayer() {
     const interval = setInterval(fetchNowPlaying, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  React.useEffect(() => {
+    const handleRemotePlay = () => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      if (!isPlaying) togglePlay();
+    };
+    window.addEventListener('nam_radio_play', handleRemotePlay);
+    return () => window.removeEventListener('nam_radio_play', handleRemotePlay);
+  }, [isPlaying]);
 
   React.useEffect(() => {
     if (audioRef.current) {
@@ -165,7 +267,15 @@ export function RadioPlayer() {
                     <span className="px-3 py-1 bg-primary/20 text-primary text-[10px] uppercase font-black tracking-widest rounded-full">
                       {nowPlaying.genre}
                     </span>
-                    <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-white/40">Broadcasting via Nam Radio</span>
+                    {nowPlaying.isLive && (
+                      <span className="px-3 py-1 bg-secondary/20 text-secondary text-[10px] uppercase font-black tracking-widest rounded-full flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                        Live: {nowPlaying.streamer}
+                      </span>
+                    )}
+                    <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-white/40">
+                      {nowPlaying.listeners} Listeners
+                    </span>
                   </div>
                   <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4 italic leading-none">
                     {nowPlaying.title}
@@ -219,7 +329,11 @@ export function RadioPlayer() {
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-sm font-bold truncate tracking-tight">{nowPlaying.title}</h4>
-              <p className="text-xs text-white/60 truncate font-medium">{nowPlaying.artist}</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-white/60 truncate font-medium">{nowPlaying.artist}</p>
+                <div className="w-1 h-1 rounded-full bg-white/20" />
+                <p className="text-[10px] text-white/20 font-bold uppercase tracking-tighter">{nowPlaying.listeners} Tuning In</p>
+              </div>
             </div>
           </div>
 

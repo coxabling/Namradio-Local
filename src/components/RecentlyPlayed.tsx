@@ -6,20 +6,30 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { History, Share2, Facebook, Twitter, MessageCircle, ExternalLink, Play } from 'lucide-react';
+import { RECENTLY_PLAYED } from '../constants';
 
 interface HistorySong {
-  sh_id: number;
-  played_at: number;
+  sh_id: string | number;
+  played_at?: number;
   song: {
     title: string;
     artist: string;
     art: string;
-    text: string;
+    text?: string;
   };
 }
 
 export function RecentlyPlayed() {
-  const [history, setHistory] = useState<HistorySong[]>([]);
+  const [history, setHistory] = useState<HistorySong[]>(
+    RECENTLY_PLAYED.map(track => ({
+      sh_id: track.id,
+      song: {
+        title: track.title,
+        artist: track.artistName,
+        art: track.coverUrl
+      }
+    }))
+  );
   const [loading, setLoading] = useState(true);
   const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
   const APP_URL = window.location.origin;

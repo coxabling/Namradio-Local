@@ -20,6 +20,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "RadioStation",
+          "name": "Nam Radio Local",
+          "url": "https://namradiolocal.com/",
+          "logo": "https://namradiolocal.com/logo.png",
+          "description": "Nam Radio Local is a modern African online radio platform empowering emerging artists with media exposure, training, and global recognition.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressRegion": "Africa"
+          },
+          "genre": ["Afrobeats", "Amapiano", "African Music", "Global Rhythms"]
+        })}
+      </script>
       <Navbar onOpenPortal={() => setIsPortalOpen(true)} />
       
       {/* Hero Section */}
@@ -48,7 +63,10 @@ export default function App() {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <button className="btn-primary">
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('nam_radio_play'))}
+                className="btn-primary"
+              >
                 Listen Live
               </button>
               <button 
