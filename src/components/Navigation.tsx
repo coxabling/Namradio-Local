@@ -163,10 +163,24 @@ export function RadioPlayer() {
     isLive: false
   });
   
+  const [nextShow, setNextShow] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const STREAM_URL = "https://music-station.live/listen/nam_radio_local/radio.mp3";
   const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+  const SCHEDULE_API = "https://music-station.live/api/station/nam_radio_local/schedule";
   const AFFILIATE_ID = "coxabling0e-21";
+
+  const fetchNextShow = async () => {
+    try {
+      const res = await fetch(SCHEDULE_API);
+      const data = await res.json();
+      const list = Array.isArray(data) ? data : (data.schedule || []);
+      const next = list.find((item: any) => !item.is_now);
+      if (next) setNextShow(next.name);
+    } catch (e) {
+      console.error("Next show fetch failed", e);
+    }
+  };
 
   const fetchNowPlaying = async () => {
     try {
@@ -192,8 +206,13 @@ export function RadioPlayer() {
 
   React.useEffect(() => {
     fetchNowPlaying();
-    const interval = setInterval(fetchNowPlaying, 15000);
-    return () => clearInterval(interval);
+    fetchNextShow();
+    const intervalNow = setInterval(fetchNowPlaying, 15000);
+    const intervalNext = setInterval(fetchNextShow, 300000); // 5 mins for schedule
+    return () => {
+      clearInterval(intervalNow);
+      clearInterval(intervalNext);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -283,6 +302,13 @@ export function RadioPlayer() {
                   <p className="text-xl md:text-2xl text-secondary font-bold uppercase tracking-tight mb-8">
                     {nowPlaying.artist}
                   </p>
+                  
+                  {nextShow && (
+                    <div className="mb-8 p-4 bg-white/5 rounded-2xl border border-white/10 inline-flex flex-col items-start gap-1">
+                      <span className="text-[10px] uppercase font-black tracking-widest text-white/20">Coming Up Next</span>
+                      <span className="text-sm font-bold text-white/80 italic">{nextShow}</span>
+                    </div>
+                  )}
                   
                   <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                     <a 

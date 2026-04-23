@@ -12,7 +12,7 @@ import { AICurator } from './components/AICurator';
 import { StationSchedule } from './components/Schedule';
 import { RecentlyPlayed } from './components/RecentlyPlayed';
 import { ArtistPortal } from './components/ArtistPortal';
-import { MOCK_ARTISTS, TRAINING_RESOURCES } from './constants';
+import { FEATURED_ARTISTS, TRAINING_RESOURCES } from './constants';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('all');
@@ -153,7 +153,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
-            {MOCK_ARTISTS.filter(artist => {
+            {FEATURED_ARTISTS.filter(artist => {
               if (activeTab === 'all') return true;
               if (activeTab === 'west') return artist.region === 'Nigeria' || artist.region === 'Ghana';
               if (activeTab === 'south') return artist.region === 'South Africa' || artist.region === 'Swaziland' || artist.region === 'Zambia';

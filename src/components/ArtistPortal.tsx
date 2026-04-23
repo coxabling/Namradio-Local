@@ -19,6 +19,7 @@ import {
   LogOut,
   Radio
 } from 'lucide-react';
+import { TRAINING_RESOURCES } from '../constants';
 
 interface AccessPortalProps {
   isOpen: boolean;
@@ -27,7 +28,28 @@ interface AccessPortalProps {
 
 export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
   const [view, setView] = useState<'entrance' | 'login' | 'dashboard'>('entrance');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [stationStats, setStationStats] = useState({ listeners: 0, uniqueListeners: 0 });
+  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+
+  React.useEffect(() => {
+    if (view === 'dashboard') {
+      const fetchStats = async () => {
+        try {
+          const res = await fetch(API_URL);
+          const data = await res.json();
+          setStationStats({
+            listeners: data.listeners?.total || 0,
+            uniqueListeners: data.listeners?.unique || 0
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      fetchStats();
+      const interval = setInterval(fetchStats, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [view]);
 
   // Simulated login for now
   const handleLogin = (e: React.FormEvent) => {
@@ -223,14 +245,20 @@ export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
                     <div className="p-8 glass rounded-[2.5rem] border-white/10 border-l-4 border-l-primary">
                       <div className="flex justify-between items-end mb-8">
                         <div>
-                          <h4 className="text-[10px] uppercase font-black tracking-widest text-primary mb-2 italic">Performance Metric</h4>
-                          <h3 className="text-5xl font-black italic tracking-tighter leading-none">12.8K <span className="text-xl font-serif text-white/40">impact</span></h3>
+                          <h4 className="text-[10px] uppercase font-black tracking-widest text-primary mb-2 italic">Global Station Reach</h4>
+                          <h3 className="text-5xl font-black italic tracking-tighter leading-none">
+                            {stationStats.listeners} <span className="text-xl font-serif text-white/40">active</span>
+                          </h3>
                         </div>
                         <div className="text-right">
-                          <span className="text-[10px] uppercase font-bold text-secondary">+24% this week</span>
+                          <span className="text-[10px] uppercase font-bold text-secondary">Live Audience</span>
                         </div>
                       </div>
-                      <div className="h-24 flex items-end gap-1">
+                      <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-white/40 mb-6">
+                        <Users size={14} className="text-primary" />
+                        <span>{stationStats.uniqueListeners} Unique Listeners This Session</span>
+                      </div>
+                      <div className="h-16 flex items-end gap-1">
                         {[40, 70, 45, 90, 65, 80, 50, 85, 95, 60].map((h, i) => (
                           <motion.div 
                             key={i}
@@ -263,25 +291,78 @@ export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
                     <div>
                       <div className="flex items-center gap-2 mb-8">
                         <Zap size={18} className="text-secondary" />
-                        <h4 className="text-[10px] uppercase font-black tracking-widest">Active Opportunity</h4>
+                        <h4 className="text-[10px] uppercase font-black tracking-widest">Industry Tip</h4>
                       </div>
-                      <h3 className="text-2xl font-black uppercase italic leading-tight mb-4">Lagos Nights <br /> Compilation</h3>
-                      <p className="text-xs text-white/40 leading-relaxed mb-8 italic">Submit your best Afro-house track for our upcoming curated playlist and legal licensing pool.</p>
+                      <h3 className="text-2xl font-black uppercase italic leading-tight mb-4">Metadata <br /> Integrity</h3>
+                      <p className="text-xs text-white/40 leading-relaxed mb-8 italic">Ensure your ISRC codes and composer credits are correctly tagged before submission to avoid royalty leakage.</p>
                       
                       <div className="space-y-3">
                         <div className="flex justify-between text-[10px] uppercase font-bold">
-                          <span className="text-white/40 italic">Slots Remaining</span>
-                          <span className="text-secondary">03/10</span>
+                          <span className="text-white/40 italic">Verification Level</span>
+                          <span className="text-secondary">Basic</span>
                         </div>
                         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-secondary w-[70%]" />
+                          <div className="h-full bg-secondary w-[40%]" />
                         </div>
                       </div>
                     </div>
-                    <button className="w-full py-4 border border-white/10 rounded-xl text-[10px] uppercase font-black tracking-widest hover:bg-white hover:text-black transition-all italic">
-                      View Details
-                    </button>
+                    <a 
+                      href="https://www.musicinafrica.net/magazine/metadata-management-musicians"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-4 border border-white/10 rounded-xl text-[10px] uppercase font-black tracking-widest hover:bg-white hover:text-black transition-all italic text-center"
+                    >
+                      Read Metadata Guide
+                    </a>
                   </div>
+                </div>
+
+                {/* Real Validated Resources Section */}
+                <div className="mt-8 mb-4">
+                  <h4 className="text-[10px] uppercase font-black tracking-[0.3em] text-white/20 mb-6 flex items-center gap-4">
+                    <div className="h-[1px] flex-1 bg-white/5" />
+                    Validated Artist Resources
+                    <div className="h-[1px] flex-1 bg-white/5" />
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {TRAINING_RESOURCES.map((resource) => (
+                      <motion.a 
+                        key={resource.id}
+                        href={resource.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ y: -5 }}
+                        className="p-6 glass rounded-3xl border-white/5 hover:border-primary/20 transition-all group flex flex-col h-full"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <span className="px-2 py-1 bg-white/5 rounded text-[8px] uppercase font-black tracking-widest text-primary">{resource.category}</span>
+                          <ChevronRight size={14} className="text-white/20 group-hover:text-primary transition-colors" />
+                        </div>
+                        <h4 className="font-bold text-sm mb-2 group-hover:text-primary transition-colors tracking-tight italic">{resource.title}</h4>
+                        <p className="text-[10px] text-white/40 mb-4 leading-relaxed line-clamp-2 italic">{resource.description}</p>
+                        <div className="mt-auto pt-4 border-t border-white/5 flex items-center justify-between opacity-40 group-hover:opacity-100 transition-opacity">
+                          <span className="text-[8px] uppercase font-black tracking-widest">Open Resource</span>
+                          <Globe2 size={12} />
+                        </div>
+                      </motion.a>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="p-8 rounded-[2rem] bg-white/5 border border-white/10 mb-20 text-center relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-4">
+                    <Radio size={40} className="text-white/[0.02] -rotate-12" />
+                  </div>
+                  <h3 className="text-2xl font-black uppercase italic mb-4">Ready to Broadcast?</h3>
+                  <p className="text-xs text-white/40 max-w-md mx-auto mb-8 italic">
+                    Submit your high-quality tracks (MP3 320kbps) along with your artist bio and cover art to our curation team.
+                  </p>
+                  <a 
+                    href="mailto:submissions@namradio.com" 
+                    className="inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-primary transition-all"
+                  >
+                    <Upload size={18} /> Submit via Email
+                  </a>
                 </div>
               </div>
             </div>

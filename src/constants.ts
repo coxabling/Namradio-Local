@@ -5,7 +5,7 @@
 
 import { Artist, Track, Resource } from './types';
 
-export const MOCK_ARTISTS: Artist[] = [
+export const FEATURED_ARTISTS: Artist[] = [
   {
     id: '1',
     name: 'Burna Boy',
@@ -86,38 +86,45 @@ export const FEATURED_TRACKS: Track[] = [
 export const TRAINING_RESOURCES: Resource[] = [
   {
     id: 'r1',
-    title: 'Music Industry How-To Guides',
-    description: 'Comprehensive guides on production, marketing, and the business of music in Africa.',
+    title: 'Music Business Know-How',
+    description: 'Practical guides on production, contracts, and the music biz in Africa.',
     category: 'Business',
     link: 'https://www.musicinafrica.net/know-how',
   },
   {
     id: 'r2',
-    title: 'Revenue Models for Musicians',
-    description: 'Exploring the various ways African artists can monetize their work in the digital age.',
+    title: 'Digital Revenue Strategies',
+    description: 'Learn how to monetize your tracks via streaming and digital sales.',
     category: 'Finance',
     link: 'https://www.musicinafrica.net/magazine/revenue-models-musicians-africa',
   },
   {
     id: 'r3',
-    title: 'Copyright and Royalties',
-    description: 'Essential knowledge on protecting your intellectual property and collecting royalties.',
+    title: 'Copyright & Royalties',
+    description: 'Southern African Music Rights Organisation (SAMRO) - Artist registration.',
     category: 'Legal',
-    link: 'https://www.musicinafrica.net/magazine/copyright-and-royalties-africa',
+    link: 'https://www.samro.org.za/',
   },
   {
     id: 'r4',
-    title: 'Digital Distribution Guide',
-    description: 'Step-by-step instructions on getting your music onto global streaming platforms.',
+    title: 'Global Distribution Protocol',
+    description: 'The definitive guide to getting your music onto Spotify, Apple, and beyond.',
     category: 'Distribution',
     link: 'https://www.musicinafrica.net/magazine/music-distribution-africa',
   },
   {
     id: 'r5',
-    title: 'African Music Data Hub',
-    description: 'Access to research and analytics on the continental music industry and trends.',
-    category: 'Data',
-    link: 'https://africanmusiclibrary.org/',
+    title: 'Artist Marketing Tools',
+    description: 'Building your brand and reaching fans across the continent and the diaspora.',
+    category: 'Marketing',
+    link: 'https://www.musicinafrica.net/magazine/marketing-your-music',
+  },
+  {
+    id: 'r6',
+    title: 'NPR Tiny Desk Africa',
+    description: 'Discover how emerging artists are reaching global audiences via NPR.',
+    category: 'Exposure',
+    link: 'https://www.npr.org/series/tiny-desk-concerts/',
   },
 ];
 

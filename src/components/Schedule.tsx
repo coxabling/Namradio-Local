@@ -24,15 +24,19 @@ export function StationSchedule() {
   const fetchSchedule = async () => {
     try {
       const response = await fetch(API_URL);
+      if (!response.ok) throw new Error('Schedule API failed');
       const data = await response.json();
-      if (Array.isArray(data)) {
+      
+      // The API often returns an array or an object depending on the station software
+      const scheduleArray = Array.isArray(data) ? data : (data.schedule || []);
+      
+      if (scheduleArray.length > 0) {
         // Filter out items with same start time or name to keep it clean
-        const uniqueItems = data.reduce((acc: ScheduleItem[], current) => {
+        const uniqueItems = scheduleArray.reduce((acc: ScheduleItem[], current: any) => {
           const x = acc.find(item => item.name === current.name || item.start === current.start);
           if (!x) {
             return acc.concat([current]);
           } else {
-            // If current is 'now', prefer it over existing match
             if (current.is_now && !x.is_now) {
               const index = acc.indexOf(x);
               acc[index] = current;
@@ -41,7 +45,6 @@ export function StationSchedule() {
           }
         }, []);
 
-        // Sort: Now playing first, then by start time
         const sorted = uniqueItems.sort((a, b) => {
           if (a.is_now && !b.is_now) return -1;
           if (!a.is_now && b.is_now) return 1;
@@ -59,6 +62,8 @@ export function StationSchedule() {
 
   useEffect(() => {
     fetchSchedule();
+    const interval = setInterval(fetchSchedule, 60000); // Check every minute
+    return () => clearInterval(interval);
   }, []);
 
   const formatTime = (dateStr: string) => {
