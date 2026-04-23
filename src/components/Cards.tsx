@@ -34,9 +34,14 @@ export const ArtistCard: React.FC<{ artist: Artist }> = ({ artist }) => {
         <p className="text-xs text-white/40 mb-4 font-medium uppercase tracking-tighter">{artist.genre}</p>
         
         <div className="flex items-center justify-between">
-          <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-secondary group-hover:text-white transition-colors">
+          <a 
+            href={artist.trackUrl || '#'} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-secondary group-hover:text-white transition-colors"
+          >
             Listen Now <Play size={10} fill="currentColor" />
-          </button>
+          </a>
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <SignalHigh size={14} className="text-primary" />
           </div>

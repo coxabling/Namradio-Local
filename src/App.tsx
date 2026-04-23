@@ -11,14 +11,16 @@ import { ArtistCard, ResourceCard } from './components/Cards';
 import { AICurator } from './components/AICurator';
 import { StationSchedule } from './components/Schedule';
 import { RecentlyPlayed } from './components/RecentlyPlayed';
+import { ArtistPortal } from './components/ArtistPortal';
 import { MOCK_ARTISTS, TRAINING_RESOURCES } from './constants';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('all');
+  const [isPortalOpen, setIsPortalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
-      <Navbar />
+      <Navbar onOpenPortal={() => setIsPortalOpen(true)} />
       
       {/* Hero Section */}
       <header id="home" className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto overflow-hidden">
@@ -49,7 +51,10 @@ export default function App() {
               <button className="btn-primary">
                 Listen Live
               </button>
-              <button className="px-8 py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all flex items-center gap-2 font-bold uppercase text-xs tracking-widest">
+              <button 
+                onClick={() => setIsPortalOpen(true)}
+                className="px-8 py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all flex items-center gap-2 font-bold uppercase text-xs tracking-widest"
+              >
                 Artist Hub <ArrowRight size={16} />
               </button>
             </div>
@@ -63,6 +68,8 @@ export default function App() {
 
       {/* AI Discovery Section */}
       <AICurator />
+      
+      <ArtistPortal isOpen={isPortalOpen} onClose={() => setIsPortalOpen(false)} />
 
       {/* Broadcast Schedule Section */}
       <StationSchedule />
@@ -128,7 +135,14 @@ export default function App() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
-            {MOCK_ARTISTS.map((artist) => (
+            {MOCK_ARTISTS.filter(artist => {
+              if (activeTab === 'all') return true;
+              if (activeTab === 'west') return artist.region === 'Nigeria' || artist.region === 'Ghana';
+              if (activeTab === 'south') return artist.region === 'South Africa' || artist.region === 'Swaziland' || artist.region === 'Zambia';
+              if (activeTab === 'east') return artist.region === 'Tanzania' || artist.region === 'Kenya';
+              if (activeTab === 'north') return artist.region === 'Egypt' || artist.region === 'Morocco';
+              return true;
+            }).map((artist) => (
               <motion.div
                 key={artist.id}
                 layout
@@ -238,7 +252,7 @@ export default function App() {
             <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Platform</h4>
             <ul className="space-y-4">
               <li><a href="#" className="hover:text-primary transition-colors">Live Radio</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Artist Submission</a></li>
+              <li><button onClick={() => setIsPortalOpen(true)} className="hover:text-primary transition-colors cursor-pointer">Artist Submission</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Global Charts</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Regions</a></li>
             </ul>
@@ -246,7 +260,7 @@ export default function App() {
           <div>
             <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Resources</h4>
             <ul className="space-y-4">
-              <li><a href="#" className="hover:text-primary transition-colors">Training Hub</a></li>
+              <li><button onClick={() => setIsPortalOpen(true)} className="hover:text-primary transition-colors cursor-pointer">Training Hub</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Marketing Guide</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Legal Support</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Community</a></li>

@@ -7,7 +7,11 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
 
-export function Navbar() {
+interface NavbarProps {
+  onOpenPortal: () => void;
+}
+
+export function Navbar({ onOpenPortal }: NavbarProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass px-6 py-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
@@ -35,8 +39,12 @@ export function Navbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-          <Search size={20} />
+        <button 
+          onClick={onOpenPortal}
+          className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white group"
+        >
+          <User size={20} className="group-hover:text-primary transition-colors" />
+          <span className="text-xs font-bold uppercase tracking-widest hidden sm:inline">Portal</span>
         </button>
         <button className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors">
           <Menu size={20} />
