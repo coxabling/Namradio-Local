@@ -5,7 +5,15 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY as string });
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient() {
+  if (!aiClient) {
+    const apiKey = process.env.GEMINI_API_KEY || "";
+    aiClient = new GoogleGenAI({ apiKey });
+  }
+  return aiClient;
+}
 
 export interface ArtistRecommendation {
   genre: string;
@@ -15,6 +23,7 @@ export interface ArtistRecommendation {
 }
 
 export async function getArtistRecommendation(prompt: string): Promise<ArtistRecommendation> {
+  const ai = getAIClient();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: prompt,
@@ -38,5 +47,6 @@ export async function getArtistRecommendation(prompt: string): Promise<ArtistRec
     }
   });
 
-  return JSON.parse(response.text);
+  const text = response.text || "{}";
+  return JSON.parse(text);
 }
