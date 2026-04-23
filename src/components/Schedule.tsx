@@ -26,8 +26,29 @@ export function StationSchedule() {
       const response = await fetch(API_URL);
       const data = await response.json();
       if (Array.isArray(data)) {
-        // Filter to remove duplicates if necessary and take the top few
-        setSchedule(data.slice(0, 4));
+        // Filter out items with same start time or name to keep it clean
+        const uniqueItems = data.reduce((acc: ScheduleItem[], current) => {
+          const x = acc.find(item => item.name === current.name || item.start === current.start);
+          if (!x) {
+            return acc.concat([current]);
+          } else {
+            // If current is 'now', prefer it over existing match
+            if (current.is_now && !x.is_now) {
+              const index = acc.indexOf(x);
+              acc[index] = current;
+            }
+            return acc;
+          }
+        }, []);
+
+        // Sort: Now playing first, then by start time
+        const sorted = uniqueItems.sort((a, b) => {
+          if (a.is_now && !b.is_now) return -1;
+          if (!a.is_now && b.is_now) return 1;
+          return new Date(a.start).getTime() - new Date(b.start).getTime();
+        });
+
+        setSchedule(sorted.slice(0, 4));
       }
     } catch (error) {
       console.error("Failed to fetch schedule:", error);

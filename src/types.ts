@@ -27,6 +27,6 @@ export interface Resource {
   id: string;
   title: string;
   description: string;
-  category: 'Training' | 'Support' | 'Marketing';
+  category: 'Training' | 'Support' | 'Marketing' | 'Business' | 'Finance' | 'Legal' | 'Distribution' | 'Data';
   link: string;
 }

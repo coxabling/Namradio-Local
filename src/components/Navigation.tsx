@@ -53,6 +53,7 @@ export function Navbar() {
 export function RadioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [volume, setVolume] = useState(0.8);
   const [nowPlaying, setNowPlaying] = useState<{
     title: string;
     artist: string;
@@ -73,6 +74,7 @@ export function RadioPlayer() {
   const fetchNowPlaying = async () => {
     try {
       const response = await fetch(API_URL);
+      if (!response.ok) throw new Error('API request failed');
       const data = await response.json();
       if (data && data.now_playing && data.now_playing.song) {
         setNowPlaying({
@@ -93,14 +95,29 @@ export function RadioPlayer() {
     return () => clearInterval(interval);
   }, []);
 
+  React.useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
       audioRef.current.pause();
     } else {
+      // Re-set source to bypass buffer latency for live stream
+      const currentSrc = audioRef.current.src;
+      audioRef.current.src = "";
+      audioRef.current.load();
+      audioRef.current.src = currentSrc;
       audioRef.current.play().catch(err => console.error("Playback failed:", err));
     }
     setIsPlaying(!isPlaying);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setVolume(parseFloat(e.target.value));
   };
 
   const amazonSearchUrl = `https://www.amazon.com/s?k=${encodeURIComponent(nowPlaying.artist + " " + nowPlaying.title)}&tag=${AFFILIATE_ID}`;
@@ -161,6 +178,18 @@ export function RadioPlayer() {
                     <button className="flex items-center gap-3 bg-white/5 border border-white/10 px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/10 transition-colors">
                       <ExternalLink size={18} /> View Artist
                     </button>
+                    <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/5 border border-white/10">
+                      <Volume2 size={16} className="text-white/40" />
+                      <input 
+                        type="range" 
+                        min="0" 
+                        max="1" 
+                        step="0.01" 
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        className="w-24 accent-primary"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -187,11 +216,18 @@ export function RadioPlayer() {
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="text-white/60 hover:text-white transition-colors">
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                <Volume2 size={20} />
-              </motion.div>
-            </button>
+            <div className="flex items-center gap-3">
+              <Volume2 size={18} className="text-white/40" />
+              <input 
+                type="range" 
+                min="0" 
+                max="1" 
+                step="0.01" 
+                value={volume}
+                onChange={handleVolumeChange}
+                className="w-16 md:w-24 accent-primary opacity-40 hover:opacity-100 transition-opacity"
+              />
+            </div>
             
             <button 
               onClick={togglePlay}
