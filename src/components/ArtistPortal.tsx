@@ -24,12 +24,32 @@ import { TRAINING_RESOURCES } from '../constants';
 interface AccessPortalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialView?: 'entrance' | 'login' | 'dashboard' | 'apply';
 }
 
-export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
-  const [view, setView] = useState<'entrance' | 'login' | 'dashboard'>('entrance');
+export function ArtistPortal({ isOpen, onClose, initialView = 'entrance' }: AccessPortalProps) {
+  const [view, setView] = useState<'entrance' | 'login' | 'dashboard' | 'apply'>(initialView);
   const [stationStats, setStationStats] = useState({ listeners: 0, uniqueListeners: 0 });
+  const [appStatus, setAppStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+
+  React.useEffect(() => {
+    if (isOpen && initialView) {
+      setView(initialView);
+      if (initialView === 'apply') {
+        setAppStatus('idle');
+      }
+    }
+  }, [isOpen, initialView]);
+
+  const handleApply = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAppStatus('submitting');
+    // Simulate API call
+    setTimeout(() => {
+      setAppStatus('success');
+    }, 2000);
+  };
 
   React.useEffect(() => {
     if (view === 'dashboard') {
@@ -130,6 +150,10 @@ export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
+                    onClick={() => {
+                      setView('apply');
+                      setAppStatus('idle');
+                    }}
                     className="w-full group p-8 rounded-[2rem] bg-white/5 border border-white/10 text-white flex items-center justify-between hover:border-white/20 transition-all"
                   >
                     <div className="text-left">
@@ -149,6 +173,99 @@ export function ArtistPortal({ isOpen, onClose }: AccessPortalProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {view === 'apply' && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-2xl w-full p-8 md:p-12 glass rounded-[3rem] border-white/10 max-h-[90vh] overflow-y-auto"
+            >
+              <button 
+                onClick={() => setView('entrance')}
+                className="mb-8 text-primary text-[10px] uppercase font-black tracking-widest flex items-center gap-2"
+              >
+                <X size={14} className="rotate-45" /> Back to Entrance
+              </button>
+              
+              {appStatus === 'success' ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-8">
+                    <ShieldCheck size={40} />
+                  </div>
+                  <h2 className="text-4xl font-black uppercase mb-4 italic tracking-tighter">Application Received</h2>
+                  <p className="text-white/60 mb-8 max-w-sm mx-auto">
+                    Your artistic profile is being verified by the Nam Radio Collective. You will receive an access key via email within 48 hours.
+                  </p>
+                  <button 
+                    onClick={() => setView('entrance')}
+                    className="px-8 py-4 bg-white text-black rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-primary transition-colors"
+                  >
+                    Return to Home
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-4xl font-black uppercase leading-none mb-4 italic tracking-tighter">Join the <br /> <span className="text-primary italic">Collective</span></h2>
+                  <p className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-12">Artist Verification Protocol 4.2 / Submission Phase</p>
+                  
+                  <form onSubmit={handleApply} className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <label className="text-[9px] uppercase font-black text-white/40 tracking-widest ml-4">Artist Name</label>
+                      <input 
+                        required
+                        type="text" 
+                        placeholder="Stage Name"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] uppercase font-black text-white/40 tracking-widest ml-4">Main Genre</label>
+                      <select className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors appearance-none">
+                        <option className="bg-black">Afrobeats</option>
+                        <option className="bg-black">Amapiano</option>
+                        <option className="bg-black">Hiphop/Trap</option>
+                        <option className="bg-black">R&B</option>
+                        <option className="bg-black">Traditional</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1 col-span-full">
+                      <label className="text-[9px] uppercase font-black text-white/40 tracking-widest ml-4">Portfolio Link (SoundCloud/Spotify)</label>
+                      <input 
+                        required
+                        type="url" 
+                        placeholder="https://..."
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-1 col-span-full">
+                      <label className="text-[9px] uppercase font-black text-white/40 tracking-widest ml-4">Artistic Background / Bio</label>
+                      <textarea 
+                        required
+                        rows={3}
+                        placeholder="Briefly describe your musical journey..."
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-colors resize-none"
+                      />
+                    </div>
+                    
+                    <button 
+                      disabled={appStatus === 'submitting'}
+                      type="submit" 
+                      className="col-span-full mt-4 py-5 bg-white text-black rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {appStatus === 'submitting' ? (
+                        <>Encrypting Data <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" /></>
+                      ) : (
+                        <>Submit Application <ArrowRight size={16} /></>
+                      )}
+                    </button>
+                    <p className="col-span-full text-center text-[8px] uppercase font-bold text-white/20 tracking-tighter">
+                      By submitting, you agree to the Nam Radio distribution terms and copyright guidelines.
+                    </p>
+                  </form>
+                </>
+              )}
+            </motion.div>
           )}
 
           {view === 'login' && (

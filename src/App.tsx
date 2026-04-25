@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio, Music, Play as PlayIcon } from 'lucide-react';
 import { Navbar, RadioPlayer } from './components/Navigation';
 import { ArtistCard, ResourceCard } from './components/Cards';
 import { AICurator } from './components/AICurator';
@@ -17,6 +17,51 @@ import { FEATURED_ARTISTS, TRAINING_RESOURCES } from './constants';
 export default function App() {
   const [activeTab, setActiveTab] = useState('all');
   const [isPortalOpen, setIsPortalOpen] = useState(false);
+  const [portalView, setPortalView] = useState<'entrance' | 'login' | 'dashboard' | 'apply'>('entrance');
+  const [nowPlaying, setNowPlaying] = useState<{
+    title: string;
+    artist: string;
+    art: string;
+    genre?: string;
+    listeners?: number;
+    isLive?: boolean;
+    streamer?: string;
+  } | null>(null);
+
+  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+
+  const fetchNowPlaying = async () => {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error('API request failed');
+      const data = await response.json();
+      
+      if (data && data.now_playing && data.now_playing.song) {
+        setNowPlaying({
+          title: data.now_playing.song.title || "Nam Radio Local",
+          artist: data.now_playing.song.artist || "African Talents",
+          art: data.now_playing.song.art || "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000",
+          genre: data.now_playing.song.genre || "Global Mix",
+          listeners: data.listeners?.total || 0,
+          streamer: data.live?.streamer_name || "",
+          isLive: data.live?.is_live || false
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch now playing info:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNowPlaying();
+    const interval = setInterval(fetchNowPlaying, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const openPortal = (view: 'entrance' | 'login' | 'dashboard' | 'apply' = 'entrance') => {
+    setPortalView(view);
+    setIsPortalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
@@ -35,31 +80,29 @@ export default function App() {
           "genre": ["Afrobeats", "Amapiano", "African Music", "Global Rhythms"]
         })}
       </script>
-      <Navbar onOpenPortal={() => setIsPortalOpen(true)} />
+      <Navbar onOpenPortal={() => openPortal('entrance')} />
       
       {/* Hero Section */}
       <header id="home" className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto overflow-hidden">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative z-10"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 mb-8">
-            <Sparkles size={14} className="text-secondary" />
-            <span className="text-[10px] uppercase font-bold tracking-[0.3em]">Empowering African Voices</span>
-          </div>
-          
-          <h1 className="text-6xl md:text-9xl font-black uppercase leading-[0.85] tracking-tighter mb-8 max-w-4xl">
-            The Sound <br /> 
-            <span className="text-primary italic">Of The</span> <br />
-            Continent
-          </h1>
-          
-          <div className="grid md:grid-cols-2 gap-12 items-end">
-            <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-lg">
+        <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/5 border border-white/10 mb-8">
+              <Sparkles size={14} className="text-secondary" />
+              <span className="text-[10px] uppercase font-bold tracking-[0.3em]">Empowering African Voices</span>
+            </div>
+            
+            <h1 className="text-6xl md:text-8xl font-black uppercase leading-[0.85] tracking-tighter mb-8 italic">
+              The Sound <br /> 
+              <span className="text-primary">Of The</span> <br />
+              Continent
+            </h1>
+            
+            <p className="text-lg md:text-xl text-white/60 leading-relaxed max-w-lg mb-8">
               Nam Radio Local is your gateway to undiscovered African talent. 
-              We bridge the gap between local rhythm and global reach, giving power 
-              back to the artists who define our culture.
+              We bridge the gap between local rhythm and global reach.
             </p>
             
             <div className="flex flex-wrap gap-4">
@@ -70,14 +113,79 @@ export default function App() {
                 Listen Live
               </button>
               <button 
-                onClick={() => setIsPortalOpen(true)}
+                onClick={() => openPortal('entrance')}
                 className="px-8 py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all flex items-center gap-2 font-bold uppercase text-xs tracking-widest"
               >
                 Artist Hub <ArrowRight size={16} />
               </button>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative"
+          >
+            <div className="relative z-10 aspect-square max-w-md mx-auto group">
+              <div className="absolute inset-0 bg-primary/20 rounded-[3rem] blur-3xl group-hover:bg-primary/30 transition-all duration-700" />
+              <div className="relative h-full glass rounded-[3rem] p-4 border-white/10 overflow-hidden shadow-2xl">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={nowPlaying?.art || 'default'}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    className="relative h-full w-full"
+                  >
+                    <img 
+                      src={nowPlaying?.art || "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000"} 
+                      alt="Now Playing Cover"
+                      className="w-full h-full object-cover rounded-[2rem] shadow-inner"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent rounded-[2rem]" />
+                    
+                    <div className="absolute bottom-8 left-8 right-8">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex gap-1">
+                          {[1, 2, 3].map(i => (
+                            <motion.div 
+                              key={i}
+                              animate={{ height: [4, 12, 4] }}
+                              transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                              className="w-1 bg-primary rounded-full"
+                            />
+                          ))}
+                        </div>
+                        <span className="text-[10px] uppercase font-black tracking-widest text-primary">Now Broadcasting</span>
+                      </div>
+                      <h3 className="text-2xl font-black uppercase tracking-tight leading-none mb-1 line-clamp-1 italic">
+                        {nowPlaying?.title || "Nam Radio Local"}
+                      </h3>
+                      <p className="text-lg text-white/60 font-medium truncate italic">
+                        {nowPlaying?.artist || "The Sound of Africa"}
+                      </p>
+                    </div>
+
+                    <button 
+                      onClick={() => window.dispatchEvent(new CustomEvent('nam_radio_play'))}
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-95"
+                    >
+                      <PlayIcon size={32} fill="white" />
+                    </button>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              
+              {/* Floating accents */}
+              <div className="absolute -top-6 -right-6 p-4 glass rounded-2xl border-white/20 animate-bounce transition-all">
+                <Music size={24} className="text-secondary" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 p-4 glass rounded-2xl border-white/20 animate-pulse transition-all">
+                <Radio size={24} className="text-primary" />
+              </div>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Abstract shapes/patterns */}
         <div className="absolute top-1/4 -right-1/4 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -z-10" />
@@ -87,7 +195,11 @@ export default function App() {
       {/* AI Discovery Section */}
       <AICurator />
       
-      <ArtistPortal isOpen={isPortalOpen} onClose={() => setIsPortalOpen(false)} />
+      <ArtistPortal 
+        isOpen={isPortalOpen} 
+        onClose={() => setIsPortalOpen(false)} 
+        initialView={portalView}
+      />
 
       {/* Broadcast Schedule Section */}
       <StationSchedule />
@@ -221,7 +333,10 @@ export default function App() {
                 <h3 className="text-2xl font-black uppercase leading-tight italic mb-8 relative z-10">
                   Ready to join <br /> the collective?
                 </h3>
-                <button className="bg-black text-white px-6 py-3 rounded-full text-[10px] uppercase font-bold tracking-widest relative z-10 hover:scale-105 transition-transform">
+                <button 
+                  onClick={() => openPortal('apply')}
+                  className="bg-black text-white px-6 py-3 rounded-full text-[10px] uppercase font-bold tracking-widest relative z-10 hover:scale-105 transition-transform"
+                >
                   Apply for Training
                 </button>
               </div>
@@ -270,7 +385,7 @@ export default function App() {
             <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Platform</h4>
             <ul className="space-y-4">
               <li><a href="#" className="hover:text-primary transition-colors">Live Radio</a></li>
-              <li><button onClick={() => setIsPortalOpen(true)} className="hover:text-primary transition-colors cursor-pointer">Artist Submission</button></li>
+              <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Artist Submission</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Global Charts</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Regions</a></li>
             </ul>
@@ -278,7 +393,7 @@ export default function App() {
           <div>
             <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Resources</h4>
             <ul className="space-y-4">
-              <li><button onClick={() => setIsPortalOpen(true)} className="hover:text-primary transition-colors cursor-pointer">Training Hub</button></li>
+              <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Training Hub</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Marketing Guide</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Legal Support</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Community</a></li>
@@ -291,7 +406,7 @@ export default function App() {
         </div>
       </footer>
 
-      <RadioPlayer />
+      <RadioPlayer externalData={nowPlaying} />
     </div>
   );
 }

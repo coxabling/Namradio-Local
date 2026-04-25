@@ -142,7 +142,19 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
   );
 }
 
-export function RadioPlayer() {
+interface RadioPlayerProps {
+  externalData?: {
+    title: string;
+    artist: string;
+    art: string;
+    genre?: string;
+    listeners?: number;
+    streamer?: string;
+    isLive?: boolean;
+  } | null;
+}
+
+export function RadioPlayer({ externalData }: RadioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [volume, setVolume] = useState(0.8);
@@ -162,13 +174,20 @@ export function RadioPlayer() {
     listeners: 0,
     isLive: false
   });
-  
+
   const [nextShow, setNextShow] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const STREAM_URL = "https://music-station.live/listen/nam_radio_local/radio.mp3";
   const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
   const SCHEDULE_API = "https://music-station.live/api/station/nam_radio_local/schedule";
   const AFFILIATE_ID = "coxabling0e-21";
+
+  // Sync with external data if provided
+  React.useEffect(() => {
+    if (externalData) {
+      setNowPlaying(externalData as any);
+    }
+  }, [externalData]);
 
   const fetchNextShow = async () => {
     try {
@@ -205,14 +224,17 @@ export function RadioPlayer() {
   };
 
   React.useEffect(() => {
-    fetchNowPlaying();
+    if (!externalData) {
+      fetchNowPlaying();
+      const intervalNow = setInterval(fetchNowPlaying, 15000);
+      return () => clearInterval(intervalNow);
+    }
+  }, [externalData]);
+
+  React.useEffect(() => {
     fetchNextShow();
-    const intervalNow = setInterval(fetchNowPlaying, 15000);
     const intervalNext = setInterval(fetchNextShow, 300000); // 5 mins for schedule
-    return () => {
-      clearInterval(intervalNow);
-      clearInterval(intervalNext);
-    };
+    return () => clearInterval(intervalNext);
   }, []);
 
   React.useEffect(() => {
@@ -319,9 +341,14 @@ export function RadioPlayer() {
                     >
                       <ShoppingCart size={18} /> Buy Now <span className="opacity-40">|</span> Amazon
                     </a>
-                    <button className="flex items-center gap-3 bg-white/5 border border-white/10 px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/10 transition-colors">
+                    <a 
+                      href={`https://www.google.com/search?q=${encodeURIComponent(nowPlaying.artist + " artist")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 bg-white/5 border border-white/10 px-8 py-3 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-white/10 transition-colors"
+                    >
                       <ExternalLink size={18} /> View Artist
-                    </button>
+                    </a>
                     <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/5 border border-white/10">
                       <Volume2 size={16} className="text-white/40" />
                       <input 

@@ -18,7 +18,9 @@ interface ScheduleItem {
 
 export function StationSchedule() {
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [fullSchedule, setFullSchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const API_URL = "https://music-station.live/api/station/nam_radio_local/schedule";
 
   const fetchSchedule = async () => {
@@ -27,11 +29,9 @@ export function StationSchedule() {
       if (!response.ok) throw new Error('Schedule API failed');
       const data = await response.json();
       
-      // The API often returns an array or an object depending on the station software
       const scheduleArray = Array.isArray(data) ? data : (data.schedule || []);
       
       if (scheduleArray.length > 0) {
-        // Filter out items with same start time or name to keep it clean
         const uniqueItems = scheduleArray.reduce((acc: ScheduleItem[], current: any) => {
           const x = acc.find(item => item.name === current.name || item.start === current.start);
           if (!x) {
@@ -51,6 +51,7 @@ export function StationSchedule() {
           return new Date(a.start).getTime() - new Date(b.start).getTime();
         });
 
+        setFullSchedule(sorted);
         setSchedule(sorted.slice(0, 4));
       }
     } catch (error) {
@@ -62,9 +63,11 @@ export function StationSchedule() {
 
   useEffect(() => {
     fetchSchedule();
-    const interval = setInterval(fetchSchedule, 60000); // Check every minute
+    const interval = setInterval(fetchSchedule, 60000); 
     return () => clearInterval(interval);
   }, []);
+
+  const displayedItems = isExpanded ? fullSchedule : schedule;
 
   const formatTime = (dateStr: string) => {
     try {
@@ -98,12 +101,12 @@ export function StationSchedule() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {schedule.map((slot, index) => (
+        {displayedItems.map((slot, index) => (
           <motion.div 
             key={slot.id || index}
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
             className={`p-6 rounded-3xl border transition-all ${
               slot.is_now 
                 ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' 
@@ -139,11 +142,14 @@ export function StationSchedule() {
           </div>
           <div>
             <h4 className="font-bold uppercase tracking-widest text-sm text-white">Full Weekly Calendar</h4>
-            <p className="text-xs text-white/40">Download our monthly artist spotlight guide.</p>
+            <p className="text-xs text-white/40">Broadcasting live 24/7 across the continent.</p>
           </div>
         </div>
-        <button className="px-8 py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest">
-          View Full Schedule
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="px-8 py-4 rounded-full border border-white/20 hover:bg-white/5 transition-all text-[10px] font-black uppercase tracking-widest"
+        >
+          {isExpanded ? 'Show Fewer Shows' : 'View Full Schedule'}
         </button>
       </div>
     </section>
