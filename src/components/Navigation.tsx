@@ -6,6 +6,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
+import { ShareNowPlaying } from './ShareNowPlaying';
 
 interface NavbarProps {
   onOpenPortal: () => void;
@@ -349,6 +350,12 @@ export function RadioPlayer({ externalData }: RadioPlayerProps) {
                     >
                       <ExternalLink size={18} /> View Artist
                     </a>
+                    
+                    <ShareNowPlaying 
+                      title={nowPlaying.title} 
+                      artist={nowPlaying.artist} 
+                      className="mt-2"
+                    />
                     <div className="flex items-center gap-4 px-6 py-3 rounded-2xl bg-white/5 border border-white/10">
                       <Volume2 size={16} className="text-white/40" />
                       <input 

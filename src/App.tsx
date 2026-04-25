@@ -12,6 +12,7 @@ import { AICurator } from './components/AICurator';
 import { StationSchedule } from './components/Schedule';
 import { RecentlyPlayed } from './components/RecentlyPlayed';
 import { ArtistPortal } from './components/ArtistPortal';
+import { ShareNowPlaying } from './components/ShareNowPlaying';
 import { FEATURED_ARTISTS, TRAINING_RESOURCES } from './constants';
 
 export default function App() {
@@ -161,9 +162,13 @@ export default function App() {
                       <h3 className="text-2xl font-black uppercase tracking-tight leading-none mb-1 line-clamp-1 italic">
                         {nowPlaying?.title || "Nam Radio Local"}
                       </h3>
-                      <p className="text-lg text-white/60 font-medium truncate italic">
+                      <p className="text-lg text-white/60 font-medium truncate italic mb-4">
                         {nowPlaying?.artist || "The Sound of Africa"}
                       </p>
+                      <ShareNowPlaying 
+                        title={nowPlaying?.title || "Nam Radio Local"} 
+                        artist={nowPlaying?.artist || "The Sound of Africa"} 
+                      />
                     </div>
 
                     <button 
