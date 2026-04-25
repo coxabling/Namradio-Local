@@ -28,7 +28,7 @@ export default function App() {
     streamer?: string;
   } | null>(null);
 
-  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+  const API_URL = "/api/nowplaying";
 
   const fetchNowPlaying = async () => {
     try {

@@ -178,8 +178,8 @@ export function RadioPlayer({ externalData }: RadioPlayerProps) {
   const [nextShow, setNextShow] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const STREAM_URL = "https://music-station.live/listen/nam_radio_local/radio.mp3";
-  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
-  const SCHEDULE_API = "https://music-station.live/api/station/nam_radio_local/schedule";
+  const API_URL = "/api/nowplaying";
+  const SCHEDULE_API = "/api/schedule";
   const AFFILIATE_ID = "coxabling0e-21";
 
   // Sync with external data if provided

@@ -31,7 +31,7 @@ export function ArtistPortal({ isOpen, onClose, initialView = 'entrance' }: Acce
   const [view, setView] = useState<'entrance' | 'login' | 'dashboard' | 'apply'>(initialView);
   const [stationStats, setStationStats] = useState({ listeners: 0, uniqueListeners: 0 });
   const [appStatus, setAppStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
-  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+  const API_URL = "/api/nowplaying";
 
   React.useEffect(() => {
     if (isOpen && initialView) {

@@ -31,7 +31,7 @@ export function RecentlyPlayed() {
     }))
   );
   const [loading, setLoading] = useState(true);
-  const API_URL = "https://music-station.live/api/nowplaying/nam_radio_local";
+  const API_URL = "/api/nowplaying";
   const APP_URL = window.location.origin;
 
   const fetchHistory = async () => {

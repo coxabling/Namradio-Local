@@ -21,7 +21,7 @@ export function StationSchedule() {
   const [fullSchedule, setFullSchedule] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
-  const API_URL = "https://music-station.live/api/station/nam_radio_local/schedule";
+  const API_URL = "/api/schedule";
 
   const fetchSchedule = async () => {
     try {
