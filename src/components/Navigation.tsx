@@ -121,9 +121,14 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
               </div>
               
               <div className="mt-auto pb-12 p-4 border-t border-white/5">
-                <div className="flex items-center gap-3 mb-6">
-                  <Globe size={18} className="text-secondary" />
-                  <span className="text-xs uppercase font-bold tracking-widest text-white/40">Broadcasting Globally from Africa</span>
+                <div className="flex flex-col gap-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <Globe size={18} className="text-secondary" />
+                    <span className="text-xs uppercase font-bold tracking-widest text-white/40">Broadcasting Globally from Africa</span>
+                  </div>
+                  <a href="mailto:info@nam-radio.com" className="text-xs uppercase font-bold tracking-widest text-primary hover:underline ml-7 transition-all">
+                    info@nam-radio.com
+                  </a>
                 </div>
                 <button 
                   onClick={() => {

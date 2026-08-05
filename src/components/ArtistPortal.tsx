@@ -194,8 +194,9 @@ export function ArtistPortal({ isOpen, onClose, initialView = 'entrance' }: Acce
                     <ShieldCheck size={40} />
                   </div>
                   <h2 className="text-4xl font-black uppercase mb-4 italic tracking-tighter">Application Received</h2>
-                  <p className="text-white/60 mb-8 max-w-sm mx-auto">
-                    Your artistic profile is being verified by the Nam Radio Collective. You will receive an access key via email within 48 hours.
+                  <p className="text-white/60 mb-8 max-w-sm mx-auto leading-relaxed">
+                    Your artistic profile is being verified by the Nam Radio Collective. You will receive an access key via email within 48 hours. 
+                    If you have questions, contact <a href="mailto:info@nam-radio.com" className="text-primary hover:underline">info@nam-radio.com</a>
                   </p>
                   <button 
                     onClick={() => setView('entrance')}

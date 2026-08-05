@@ -6,11 +6,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { History, Share2, Facebook, Twitter, MessageCircle, ExternalLink, Play } from 'lucide-react';
-import { RECENTLY_PLAYED } from '../constants';
 
 interface HistorySong {
   sh_id: string | number;
   played_at?: number;
+  playlist?: string;
   song: {
     title: string;
     artist: string;
@@ -20,16 +20,7 @@ interface HistorySong {
 }
 
 export function RecentlyPlayed() {
-  const [history, setHistory] = useState<HistorySong[]>(
-    RECENTLY_PLAYED.map(track => ({
-      sh_id: track.id,
-      song: {
-        title: track.title,
-        artist: track.artistName,
-        art: track.coverUrl
-      }
-    }))
-  );
+  const [history, setHistory] = useState<HistorySong[]>([]);
   const [loading, setLoading] = useState(true);
   const API_URL = "/api/nowplaying";
   const APP_URL = window.location.origin;
@@ -39,7 +30,9 @@ export function RecentlyPlayed() {
       const response = await fetch(API_URL);
       const data = await response.json();
       if (data && data.song_history) {
-        setHistory(data.song_history.slice(0, 6));
+        // Filter out empty jingles/announcements if needed, or keep all real played songs
+        const validSongs = data.song_history.filter((item: any) => item.song?.title && item.song?.title !== "namradio jingle 1");
+        setHistory(validSongs.length > 0 ? validSongs.slice(0, 6) : data.song_history.slice(0, 6));
       }
     } catch (error) {
       console.error("Failed to fetch song history:", error);

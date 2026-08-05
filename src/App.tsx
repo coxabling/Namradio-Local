@@ -13,12 +13,14 @@ import { StationSchedule } from './components/Schedule';
 import { RecentlyPlayed } from './components/RecentlyPlayed';
 import { ArtistPortal } from './components/ArtistPortal';
 import { ShareNowPlaying } from './components/ShareNowPlaying';
-import { FEATURED_ARTISTS, TRAINING_RESOURCES } from './constants';
+import { TRAINING_RESOURCES } from './constants';
+import { Artist } from './types';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('all');
   const [isPortalOpen, setIsPortalOpen] = useState(false);
   const [portalView, setPortalView] = useState<'entrance' | 'login' | 'dashboard' | 'apply'>('entrance');
+  const [featuredArtists, setFeaturedArtists] = useState<Artist[]>([]);
   const [nowPlaying, setNowPlaying] = useState<{
     title: string;
     artist: string;
@@ -47,6 +49,45 @@ export default function App() {
           streamer: data.live?.streamer_name || "",
           isLive: data.live?.is_live || false
         });
+
+        // Build real artist profiles from live song metadata and history
+        const allTracks: any[] = [];
+        if (data.now_playing?.song) allTracks.push({ ...data.now_playing.song, playlist: data.now_playing.playlist });
+        if (data.playing_next?.song) allTracks.push({ ...data.playing_next.song, playlist: data.playing_next.playlist });
+        if (Array.isArray(data.song_history)) {
+          data.song_history.forEach((sh: any) => {
+            if (sh.song) allTracks.push({ ...sh.song, playlist: sh.playlist });
+          });
+        }
+
+        const uniqueArtistsMap = new Map<string, Artist>();
+
+        allTracks.forEach((tr: any) => {
+          const artistName = (tr.artist || "").trim();
+          if (!artistName || artistName === "-" || artistName.toLowerCase().includes("namradio") || artistName.toLowerCase().includes("jingle")) return;
+          
+          if (!uniqueArtistsMap.has(artistName)) {
+            let region = "Africa";
+            const playlist = (tr.playlist || "").toLowerCase();
+            if (playlist.includes("nigeria")) region = "Nigeria";
+            else if (playlist.includes("ghana")) region = "Ghana";
+            else if (playlist.includes("south")) region = "South Africa";
+            else if (playlist.includes("east")) region = "Tanzania";
+            else if (playlist.includes("north") || playlist.includes("egypt")) region = "Egypt";
+
+            uniqueArtistsMap.set(artistName, {
+              id: artistName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+              name: artistName,
+              genre: tr.genre || (tr.playlist ? tr.playlist.replace(/[^a-zA-Z &]/g, '').trim() : "Afrobeats"),
+              region: region,
+              bio: tr.title ? `Currently featured on Nam Radio Local airwaves with "${tr.title}".` : 'Broadcasting live on Nam Radio Local.',
+              imageUrl: tr.art || "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1000",
+              trackUrl: "https://music-station.live/listen/nam_radio_local/radio.mp3"
+            });
+          }
+        });
+
+        setFeaturedArtists(Array.from(uniqueArtistsMap.values()));
       }
     } catch (error) {
       console.error("Failed to fetch now playing info:", error);
@@ -67,19 +108,73 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
       <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "RadioStation",
-          "name": "Nam Radio Local",
-          "url": "https://namradiolocal.com/",
-          "logo": "https://namradiolocal.com/logo.png",
-          "description": "Nam Radio Local is a modern African online radio platform empowering emerging artists with media exposure, training, and global recognition.",
-          "address": {
-            "@type": "PostalAddress",
-            "addressRegion": "Africa"
+        {JSON.stringify([
+          {
+            "@context": "https://schema.org",
+            "@type": "RadioStation",
+            "@id": "https://namradiolocal.com/#station",
+            "name": "Nam Radio Local",
+            "alternateName": "Nam Radio",
+            "url": "https://namradiolocal.com/",
+            "logo": "https://namradiolocal.com/logo.png",
+            "image": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200",
+            "description": "Nam Radio Local is an all-African online radio station empowering emerging artists with global media exposure, music industry training, and airplay.",
+            "email": "info@nam-radio.com",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Windhoek",
+              "addressRegion": "Khomas",
+              "addressCountry": "NA"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": -22.5609,
+              "longitude": 17.0658
+            },
+            "areaServed": [
+              {
+                "@type": "Country",
+                "name": "Namibia"
+              },
+              {
+                "@type": "Continent",
+                "name": "Africa"
+              },
+              {
+                "@type": "Place",
+                "name": "Worldwide"
+              }
+            ],
+            "genre": ["Afrobeats", "Amapiano", "African Music", "Global Rhythms", "Bongo Flava"],
+            "sameAs": [
+              "https://www.facebook.com/namradiolocal",
+              "https://www.nam-radio.com/local"
+            ]
           },
-          "genre": ["Afrobeats", "Amapiano", "African Music", "Global Rhythms"]
-        })}
+          {
+            "@context": "https://schema.org",
+            "@type": "BroadcastService",
+            "name": "Nam Radio Local Live Stream",
+            "broadcaster": {
+              "@type": "RadioStation",
+              "name": "Nam Radio Local"
+            },
+            "broadcastDisplayName": "Nam Radio Local 24/7 Live Stream",
+            "broadcastChannelId": "nam_radio_local",
+            "genre": "African Music",
+            "inLanguage": "en"
+          },
+          ...(nowPlaying?.title ? [{
+            "@context": "https://schema.org",
+            "@type": "MusicRecording",
+            "name": nowPlaying.title,
+            "byArtist": {
+              "@type": "MusicGroup",
+              "name": nowPlaying.artist
+            },
+            "genre": "African Music"
+          }] : [])
+        ])}
       </script>
       <Navbar onOpenPortal={() => openPortal('entrance')} />
       
@@ -270,25 +365,31 @@ export default function App() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence mode="popLayout">
-            {FEATURED_ARTISTS.filter(artist => {
-              if (activeTab === 'all') return true;
-              if (activeTab === 'west') return artist.region === 'Nigeria' || artist.region === 'Ghana';
-              if (activeTab === 'south') return artist.region === 'South Africa' || artist.region === 'Swaziland' || artist.region === 'Zambia';
-              if (activeTab === 'east') return artist.region === 'Tanzania' || artist.region === 'Kenya';
-              if (activeTab === 'north') return artist.region === 'Egypt' || artist.region === 'Morocco';
-              return true;
-            }).map((artist) => (
-              <motion.div
-                key={artist.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ArtistCard artist={artist} />
-              </motion.div>
-            ))}
+            {featuredArtists.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-white/40 text-xs font-mono uppercase tracking-widest animate-pulse">
+                Loading live artists from Nam Radio Local airwaves...
+              </div>
+            ) : (
+              featuredArtists.filter(artist => {
+                if (activeTab === 'all') return true;
+                if (activeTab === 'west') return artist.region === 'Nigeria' || artist.region === 'Ghana' || artist.genre.toLowerCase().includes('afro');
+                if (activeTab === 'south') return artist.region === 'South Africa' || artist.region === 'Swaziland' || artist.genre.toLowerCase().includes('amapiano');
+                if (activeTab === 'east') return artist.region === 'Tanzania' || artist.region === 'Kenya' || artist.genre.toLowerCase().includes('bongo');
+                if (activeTab === 'north') return artist.region === 'Egypt' || artist.genre.toLowerCase().includes('trap');
+                return true;
+              }).map((artist) => (
+                <motion.div
+                  key={artist.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <ArtistCard artist={artist} />
+                </motion.div>
+              ))
+            )}
           </AnimatePresence>
         </div>
       </section>
@@ -401,13 +502,18 @@ export default function App() {
               <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Training Hub</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Marketing Guide</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Legal Support</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Community</a></li>
+              <li><a href="mailto:info@nam-radio.com" className="hover:text-primary transition-colors">Contact Support</a></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-[10px] uppercase font-bold tracking-[0.2em] text-white/20">
-          <span>© 2026 Nam Radio Local</span>
-          <span>Made in Africa for the World</span>
+        <div className="max-w-7xl mx-auto px-6 pt-12 border-t border-white/5 flex flex-wrap gap-8 justify-between items-center text-[10px] uppercase font-bold tracking-[0.2em] text-white/20">
+          <div className="flex gap-8">
+            <span>© 2026 Nam Radio Local</span>
+            <span>Made in Africa for the World</span>
+          </div>
+          <div className="flex gap-8">
+            <a href="mailto:info@nam-radio.com" className="hover:text-white transition-colors">info@nam-radio.com</a>
+          </div>
         </div>
       </footer>
 
