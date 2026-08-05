@@ -48,6 +48,18 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
+          <a
+            href="https://www.nam-radio.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-2 px-3.5 py-1.5 bg-primary/10 hover:bg-primary hover:text-black text-primary border border-primary/30 rounded-full transition-all text-[10px] font-bold uppercase tracking-wider group"
+            title="Visit Partner Radio Station www.nam-radio.com"
+          >
+            <Globe size={14} className="group-hover:rotate-12 transition-transform" />
+            <span>Partner: www.nam-radio.com</span>
+            <ExternalLink size={12} />
+          </a>
+
           <button 
             onClick={onOpenPortal}
             className="flex items-center gap-2 px-3 sm:px-4 py-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white group"
@@ -121,6 +133,17 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
               </div>
               
               <div className="mt-auto pb-12 p-4 border-t border-white/5">
+                <a
+                  href="https://www.nam-radio.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-primary hover:text-black text-white rounded-2xl border border-white/10 transition-all text-xs font-bold uppercase tracking-widest mb-4 group"
+                >
+                  <Globe size={16} className="text-primary group-hover:text-black transition-colors" /> 
+                  <span>Partner Station: www.nam-radio.com</span>
+                  <ExternalLink size={14} />
+                </a>
+
                 <div className="flex flex-col gap-4 mb-6">
                   <div className="flex items-center gap-3">
                     <Globe size={18} className="text-secondary" />

@@ -27,6 +27,10 @@ export interface Resource {
   id: string;
   title: string;
   description: string;
-  category: 'Training' | 'Support' | 'Marketing' | 'Business' | 'Finance' | 'Legal' | 'Distribution' | 'Data' | 'Exposure';
+  category: 'Business' | 'Finance' | 'Legal' | 'Distribution' | 'Marketing' | 'Exposure' | 'Production' | 'Grants';
   link: string;
+  checklist?: string[];
+  readTime?: string;
+  level?: 'Beginner' | 'Intermediate' | 'Advanced';
+  author?: string;
 }

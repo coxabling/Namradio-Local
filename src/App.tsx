@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio, Music, Play as PlayIcon } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio, Music, Play as PlayIcon, Globe, ExternalLink } from 'lucide-react';
 import { Navbar, RadioPlayer } from './components/Navigation';
 import { ArtistCard, ResourceCard } from './components/Cards';
 import { AICurator } from './components/AICurator';
@@ -201,7 +201,7 @@ export default function App() {
               We bridge the gap between local rhythm and global reach.
             </p>
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <button 
                 onClick={() => window.dispatchEvent(new CustomEvent('nam_radio_play'))}
                 className="btn-primary"
@@ -214,6 +214,16 @@ export default function App() {
               >
                 Artist Hub <ArrowRight size={16} />
               </button>
+              <a 
+                href="https://www.nam-radio.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-4 rounded-full bg-primary/10 hover:bg-primary hover:text-black border border-primary/30 text-primary transition-all flex items-center gap-2 font-bold uppercase text-xs tracking-widest group"
+              >
+                <Globe size={16} className="group-hover:rotate-12 transition-transform" />
+                <span>Partner Station: www.nam-radio.com</span>
+                <ExternalLink size={14} />
+              </a>
             </div>
           </motion.div>
 
@@ -400,51 +410,103 @@ export default function App() {
       {/* Training & Support (Impact Section) */}
       <section id="training" className="py-24 px-6 bg-surface-bright african-pattern">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-white/5 pb-8">
             <div>
-              <span className="text-secondary text-[10px] uppercase font-black tracking-[0.4em] mb-4 block">Power to the Artist</span>
-              <h2 className="text-4xl md:text-6xl font-black uppercase leading-[0.9] tracking-tighter mb-8 italic">
-                Bridging the <br /> 
-                <span className="text-primary italic underline underline-offset-8">Resource Gap</span>
+              <span className="text-secondary text-[10px] uppercase font-black tracking-[0.4em] mb-3 block">Power to the Artist</span>
+              <h2 className="text-4xl md:text-6xl font-black uppercase leading-[0.9] tracking-tighter italic">
+                Artist Training <br /> 
+                <span className="text-primary italic underline underline-offset-8">Hub & Knowledge Base</span>
               </h2>
-              <p className="text-white/60 mb-12 leading-relaxed text-lg">
-                We don't just play music; we build careers. Our mission is to combat social 
-                exclusion by providing the training, knowledge, and tools emerging artists need 
-                to attract mainstream platforms and gain international recognition.
+            </div>
+
+            {/* Social Share Training Hub */}
+            <div className="flex flex-col items-start md:items-end gap-2">
+              <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Share Training Hub</span>
+              <div className="flex items-center gap-2 bg-black/40 p-2 rounded-2xl border border-white/10">
+                <a
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Access free Music Business, Copyright & Distribution Training for African Artists on Nam Radio Local: " + window.location.origin + "#training")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-black transition-all text-xs font-bold flex items-center gap-1.5"
+                >
+                  WhatsApp
+                </a>
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Free African Music Business & Artist Training Hub on Nam Radio Local 📻")}&url=${encodeURIComponent(window.location.origin + "#training")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-sky-600/20 text-sky-400 hover:bg-sky-500 hover:text-black transition-all text-xs font-bold flex items-center gap-1.5"
+                >
+                  X / Twitter
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin + "#training")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-xl bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5"
+                >
+                  Facebook
+                </a>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`Nam Radio Local Artist Training Hub: ${window.location.origin}#training`);
+                    alert("Training Hub link copied to clipboard!");
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-white/10 text-white hover:bg-white hover:text-black transition-all text-xs font-bold cursor-pointer"
+                >
+                  Copy Hub Link
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-12 items-start mb-16">
+            <div className="lg:col-span-4 space-y-8">
+              <p className="text-white/70 leading-relaxed text-base">
+                We don't just play music; we build sustainable careers. Our comprehensive 
+                training curriculum covers music publishing, copyright registration (SAMRO, CMOs), 
+                digital DSP distribution, social media marketing, audio mixing, and cultural grant funding.
               </p>
               
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {[
-                  { title: "Digital Literacy", desc: "Mastering the online music ecosystem." },
-                  { title: "Media Relations", desc: "How to tell your story to the world." },
-                  { title: "Legal Support", desc: "Protecting your artistic intellectual property." }
+                  { title: "Digital Literacy & Distribution", desc: "Claim DSP profiles, pitch to playlists, and master metadata." },
+                  { title: "Legal Rights & Copyright", desc: "Register split sheets, ISRC codes, and performance royalties." },
+                  { title: "Media & Brand Relations", desc: "Crafting EPKs and telling your artistic story to global outlets." },
+                  { title: "Grant & Project Funding", desc: "Access continental funding programs and cultural grants." }
                 ].map((item, i) => (
-                  <div key={i} className="flex gap-4">
-                    <div className="w-1 h-auto bg-primary/30 rounded-full" />
+                  <div key={i} className="flex gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <div className="w-1.5 h-auto bg-primary rounded-full flex-shrink-0" />
                     <div>
-                      <h4 className="font-bold text-sm uppercase tracking-widest mb-1">{item.title}</h4>
-                      <p className="text-xs text-white/40">{item.desc}</p>
+                      <h4 className="font-bold text-xs uppercase tracking-widest mb-1 text-white">{item.title}</h4>
+                      <p className="text-xs text-white/50 leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {TRAINING_RESOURCES.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
-              ))}
-              <div className="p-6 rounded-2xl bg-primary flex flex-col justify-between items-start text-black overflow-hidden relative">
-                <Users size={80} className="absolute -bottom-4 -right-4 opacity-10 rotate-12" />
-                <h3 className="text-2xl font-black uppercase leading-tight italic mb-8 relative z-10">
-                  Ready to join <br /> the collective?
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/20 to-surface border border-primary/30 relative overflow-hidden">
+                <Users size={80} className="absolute -bottom-4 -right-4 opacity-10 rotate-12 text-primary" />
+                <h3 className="text-xl font-black uppercase italic mb-2 relative z-10">
+                  Ready for 1-on-1 Mentorship?
                 </h3>
+                <p className="text-xs text-white/70 mb-6 leading-relaxed relative z-10">
+                  Submit your artistic profile to join the Nam Radio Local Collective and access direct legal & promotional support.
+                </p>
                 <button 
                   onClick={() => openPortal('apply')}
-                  className="bg-black text-white px-6 py-3 rounded-full text-[10px] uppercase font-bold tracking-widest relative z-10 hover:scale-105 transition-transform"
+                  className="bg-primary text-black px-6 py-3 rounded-full text-xs uppercase font-black tracking-widest relative z-10 hover:scale-105 transition-transform cursor-pointer"
                 >
                   Apply for Training
                 </button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {TRAINING_RESOURCES.map((resource) => (
+                  <ResourceCard key={resource.id} resource={resource} />
+                ))}
               </div>
             </div>
           </div>
@@ -493,7 +555,16 @@ export default function App() {
               <li><a href="#" className="hover:text-primary transition-colors">Live Radio</a></li>
               <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Artist Submission</button></li>
               <li><a href="#" className="hover:text-primary transition-colors">Global Charts</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Regions</a></li>
+              <li>
+                <a 
+                  href="https://www.nam-radio.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="hover:text-primary transition-colors flex items-center gap-1.5 text-primary font-bold"
+                >
+                  <Globe size={12} /> Partner: www.nam-radio.com <ExternalLink size={10} />
+                </a>
+              </li>
             </ul>
           </div>
           <div>
