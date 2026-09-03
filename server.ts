@@ -47,6 +47,15 @@ async function startServer() {
     }
   });
 
+  // Explicit endpoints for authorized digital sellers txt files
+  const adsTxtHandler = (_req: express.Request, res: express.Response) => {
+    res.type("text/plain; charset=utf-8");
+    res.sendFile(path.join(process.cwd(), "public", "ads.txt"));
+  };
+  app.get("/ads.txt", adsTxtHandler);
+  app.get("/add.txt", adsTxtHandler);
+  app.get("/app-ads.txt", adsTxtHandler);
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
