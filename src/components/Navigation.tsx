@@ -5,27 +5,54 @@
 
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
+import { Menu, X, Search, Globe, User, Radio, Info, Home, Mic2, GraduationCap, Play, Pause, Volume2, ShoppingCart, ChevronUp, ChevronDown, ExternalLink, Calendar, BookOpen, Music2, Zap, Disc3 } from 'lucide-react';
 import { ShareNowPlaying } from './ShareNowPlaying';
 
 interface NavbarProps {
   onOpenPortal: () => void;
+  currentPath?: string;
+  navigate?: (path: string) => void;
 }
 
-export function Navbar({ onOpenPortal }: NavbarProps) {
+export function Navbar({ onOpenPortal, currentPath = '/', navigate }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isGenresOpen, setIsGenresOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Home', href: '#home', icon: Home },
-    { name: 'Artists', href: '#artists', icon: Mic2 },
-    { name: 'Training', href: '#training', icon: GraduationCap },
-    { name: 'About', href: '#about', icon: Info },
+    { name: 'Home', href: '/', icon: Home },
+    { name: 'Schedule', href: '/schedule', icon: Calendar },
+    { name: 'Artists', href: '/artists', icon: Mic2 },
+    { name: 'News & Blog', href: '/blog', icon: BookOpen },
+    { name: 'About', href: '/about', icon: Info },
   ];
+
+  const genreLinks = [
+    { name: 'Afrobeats', href: '/genres/afrobeats', desc: 'West African Rhythms' },
+    { name: 'Amapiano', href: '/genres/amapiano', desc: 'South African Log Drums' },
+    { name: 'Bongo Flava', href: '/genres/bongo-flava', desc: 'East African Melodies' },
+  ];
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/')) {
+      e.preventDefault();
+      if (navigate) {
+        navigate(href);
+      } else {
+        window.location.href = href;
+      }
+      setIsMenuOpen(false);
+      setIsGenresOpen(false);
+    }
+  };
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-[60] glass px-6 py-4 flex items-center justify-between border-b border-white/5">
-        <a href="#home" className="flex items-center gap-2 group">
+        <a 
+          href="/" 
+          onClick={(e) => handleLinkClick(e, '/')}
+          className="flex items-center gap-2 group cursor-pointer"
+        >
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
             <Radio className="text-black" />
           </div>
@@ -35,16 +62,60 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
         </a>
 
         {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">
-          {navLinks.map((link) => (
-            <a 
-              key={link.name} 
-              href={link.href} 
-              className="hover:text-primary transition-colors flex items-center gap-2"
+        <div className="hidden lg:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">
+          {navLinks.map((link) => {
+            const isActive = currentPath === link.href;
+            return (
+              <a 
+                key={link.name} 
+                href={link.href}
+                onClick={(e) => handleLinkClick(e, link.href)}
+                className={`transition-colors flex items-center gap-1.5 py-1 ${
+                  isActive ? 'text-primary font-black' : 'hover:text-primary'
+                }`}
+              >
+                <link.icon size={13} /> {link.name}
+              </a>
+            );
+          })}
+
+          {/* Genres Dropdown */}
+          <div className="relative" onMouseLeave={() => setIsGenresOpen(false)}>
+            <button
+              onClick={() => setIsGenresOpen(!isGenresOpen)}
+              onMouseEnter={() => setIsGenresOpen(true)}
+              className={`flex items-center gap-1 hover:text-primary transition-colors py-1 cursor-pointer ${
+                currentPath.startsWith('/genres') ? 'text-primary font-black' : ''
+              }`}
             >
-              <link.icon size={14} /> {link.name}
-            </a>
-          ))}
+              <Disc3 size={13} />
+              <span>Genres</span>
+              <ChevronDown size={11} className={`transition-transform ${isGenresOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {isGenresOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-black/95 backdrop-blur-2xl border border-white/10 p-2 shadow-2xl z-50"
+                >
+                  {genreLinks.map((g) => (
+                    <a
+                      key={g.name}
+                      href={g.href}
+                      onClick={(e) => handleLinkClick(e, g.href)}
+                      className="block p-2.5 rounded-xl hover:bg-white/10 transition-colors"
+                    >
+                      <div className="font-bold text-white text-xs">{g.name}</div>
+                      <div className="text-[10px] text-white/40 normal-case tracking-normal">{g.desc}</div>
+                    </a>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
@@ -116,20 +187,38 @@ export function Navbar({ onOpenPortal }: NavbarProps) {
             
             <div className="absolute inset-0 pt-24 px-6 flex flex-col gap-6 overflow-y-auto">
               <div className="flex flex-col gap-2">
-                <span className="text-[10px] uppercase font-black tracking-[0.3em] text-primary mb-4 p-4">Navigation</span>
+                <span className="text-[10px] uppercase font-black tracking-[0.3em] text-primary mb-2 px-4">Navigation</span>
                 {navLinks.map((link) => (
                   <a
                     key={link.name}
                     href={link.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors text-2xl font-black uppercase tracking-tighter group"
+                    onClick={(e) => handleLinkClick(e, link.href)}
+                    className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-colors text-xl font-black uppercase tracking-tighter group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors">
-                      <link.icon size={24} />
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary group-hover:text-black transition-colors">
+                      <link.icon size={20} />
                     </div>
                     {link.name}
                   </a>
                 ))}
+
+                <span className="text-[10px] uppercase font-black tracking-[0.3em] text-primary mt-4 mb-2 px-4">African Genres</span>
+                <div className="grid grid-cols-1 gap-2 px-2">
+                  {genreLinks.map((g) => (
+                    <a
+                      key={g.name}
+                      href={g.href}
+                      onClick={(e) => handleLinkClick(e, g.href)}
+                      className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-bold text-sm text-white">{g.name}</div>
+                        <div className="text-[10px] text-white/40">{g.desc}</div>
+                      </div>
+                      <ChevronDown size={14} className="-rotate-90 text-primary" />
+                    </a>
+                  ))}
+                </div>
               </div>
               
               <div className="mt-auto pb-12 p-4 border-t border-white/5">

@@ -1,6 +1,6 @@
 {
   "name": "Nam Radio Local",
-  "description": "Nam Radio Local - Empowering African Artists & Global Rhythms. Broadcasting live from Windhoek, Namibia.",
+  "description": "Discover the heartbeat of Africa on Nam Radio Local. Broadcasting live 24/7 from Windhoek, Namibia, empowering emerging African artists with global airplay in Afrobeats, Amapiano, and Bongo Flava.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

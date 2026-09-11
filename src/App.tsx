@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio, Music, Play as PlayIcon, Globe, ExternalLink } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Globe2, ShieldCheck, Users, Radio, Music, Play as PlayIcon, Globe, ExternalLink, Calendar, BookOpen, Music2, Disc3 } from 'lucide-react';
 import { Navbar, RadioPlayer } from './components/Navigation';
 import { ArtistCard, ResourceCard } from './components/Cards';
 import { AICurator } from './components/AICurator';
@@ -13,10 +13,21 @@ import { StationSchedule } from './components/Schedule';
 import { RecentlyPlayed } from './components/RecentlyPlayed';
 import { ArtistPortal } from './components/ArtistPortal';
 import { ShareNowPlaying } from './components/ShareNowPlaying';
+import { AboutPage } from './components/pages/AboutPage';
+import { SchedulePage } from './components/pages/SchedulePage';
+import { ArtistsPage } from './components/pages/ArtistsPage';
+import { GenreAfrobeatsPage } from './components/pages/GenreAfrobeatsPage';
+import { GenreAmapianoPage } from './components/pages/GenreAmapianoPage';
+import { GenreBongoFlavaPage } from './components/pages/GenreBongoFlavaPage';
+import { BlogPage } from './components/pages/BlogPage';
+import { PAGES_SEO, BRAND_OG_IMAGE } from './seoData';
 import { TRAINING_RESOURCES } from './constants';
 import { Artist } from './types';
 
 export default function App() {
+  const [currentPath, setCurrentPath] = useState<string>(
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
   const [activeTab, setActiveTab] = useState('all');
   const [isPortalOpen, setIsPortalOpen] = useState(false);
   const [portalView, setPortalView] = useState<'entrance' | 'login' | 'dashboard' | 'apply'>('entrance');
@@ -32,6 +43,40 @@ export default function App() {
   } | null>(null);
 
   const API_URL = "/api/nowplaying";
+
+  const navigate = (path: string) => {
+    setCurrentPath(path);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({}, '', path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const seo = PAGES_SEO[path] || PAGES_SEO['/'];
+      if (seo) {
+        document.title = seo.title;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', seo.description);
+        const canonical = document.querySelector('link[rel="canonical"]');
+        if (canonical) canonical.setAttribute('href', seo.canonical);
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', seo.title);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', seo.description);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const onPopState = () => {
+      const path = window.location.pathname;
+      setCurrentPath(path);
+      const seo = PAGES_SEO[path] || PAGES_SEO['/'];
+      if (seo) {
+        document.title = seo.title;
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const fetchNowPlaying = async () => {
     try {
@@ -176,10 +221,30 @@ export default function App() {
           }] : [])
         ])}
       </script>
-      <Navbar onOpenPortal={() => openPortal('entrance')} />
-      
-      {/* Hero Section */}
-      <header id="home" className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto overflow-hidden">
+      <Navbar 
+        onOpenPortal={() => openPortal('entrance')} 
+        currentPath={currentPath} 
+        navigate={navigate} 
+      />
+
+      {currentPath === '/about' ? (
+        <AboutPage onOpenPortal={openPortal} navigate={navigate} />
+      ) : currentPath === '/schedule' ? (
+        <SchedulePage navigate={navigate} />
+      ) : currentPath === '/artists' ? (
+        <ArtistsPage onOpenPortal={openPortal} navigate={navigate} />
+      ) : currentPath === '/genres/afrobeats' ? (
+        <GenreAfrobeatsPage navigate={navigate} onOpenPortal={openPortal} />
+      ) : currentPath === '/genres/amapiano' ? (
+        <GenreAmapianoPage navigate={navigate} onOpenPortal={openPortal} />
+      ) : currentPath === '/genres/bongo-flava' ? (
+        <GenreBongoFlavaPage navigate={navigate} onOpenPortal={openPortal} />
+      ) : (currentPath === '/blog' || currentPath === '/news') ? (
+        <BlogPage navigate={navigate} onOpenPortal={openPortal} />
+      ) : (
+        <>
+          {/* Hero Section */}
+          <header id="home" className="relative pt-32 pb-20 px-6 max-w-7xl mx-auto overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-12 items-center relative z-10">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
@@ -527,6 +592,9 @@ export default function App() {
         </div>
       </section>
 
+        </>
+      )}
+
       <footer className="pt-24 pb-48 border-t border-white/5 bg-surface">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 text-sm text-white/40 mb-20">
           <div className="col-span-2">
@@ -539,22 +607,43 @@ export default function App() {
               </span>
             </div>
             <p className="max-w-xs mb-8">
-              Combatting social exclusion through the power of African music and artist empowerment.
+              Broadcasting 24/7 live from Windhoek, Namibia. Combatting social exclusion through the power of African music and emerging artist empowerment.
             </p>
             <div className="flex gap-4">
-              {['Facebook', 'Twitter', 'Insta', 'RadioAF'].map(s => (
-                <button key={s} className="text-[10px] uppercase font-bold hover:text-white transition-colors">
-                  {s}
-                </button>
-              ))}
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-bold hover:text-white transition-colors">
+                Facebook
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-bold hover:text-white transition-colors">
+                Twitter
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[10px] uppercase font-bold hover:text-white transition-colors">
+                Instagram
+              </a>
             </div>
           </div>
           <div>
-            <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Platform</h4>
+            <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Broadcast & Music</h4>
             <ul className="space-y-4">
-              <li><a href="#" className="hover:text-primary transition-colors">Live Radio</a></li>
-              <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Artist Submission</button></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Global Charts</a></li>
+              <li>
+                <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Live Radio
+                </a>
+              </li>
+              <li>
+                <a href="/schedule" onClick={(e) => { e.preventDefault(); navigate('/schedule'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Program Schedule
+                </a>
+              </li>
+              <li>
+                <a href="/artists" onClick={(e) => { e.preventDefault(); navigate('/artists'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  African Artists Roster
+                </a>
+              </li>
+              <li>
+                <button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">
+                  Artist Music Submission
+                </button>
+              </li>
               <li>
                 <a 
                   href="https://www.nam-radio.com" 
@@ -568,12 +657,33 @@ export default function App() {
             </ul>
           </div>
           <div>
-            <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Resources</h4>
+            <h4 className="font-bold uppercase tracking-widest text-xs text-white mb-6">Explore & Learn</h4>
             <ul className="space-y-4">
-              <li><button onClick={() => openPortal('apply')} className="hover:text-primary transition-colors cursor-pointer text-left w-full">Training Hub</button></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Marketing Guide</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Legal Support</a></li>
-              <li><a href="mailto:info@nam-radio.com" className="hover:text-primary transition-colors">Contact Support</a></li>
+              <li>
+                <a href="/genres/afrobeats" onClick={(e) => { e.preventDefault(); navigate('/genres/afrobeats'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Afrobeats Culture
+                </a>
+              </li>
+              <li>
+                <a href="/genres/amapiano" onClick={(e) => { e.preventDefault(); navigate('/genres/amapiano'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Amapiano Log Drums
+                </a>
+              </li>
+              <li>
+                <a href="/genres/bongo-flava" onClick={(e) => { e.preventDefault(); navigate('/genres/bongo-flava'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Bongo Flava Melodies
+                </a>
+              </li>
+              <li>
+                <a href="/blog" onClick={(e) => { e.preventDefault(); navigate('/blog'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  Music Industry Blog
+                </a>
+              </li>
+              <li>
+                <a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }} className="hover:text-primary transition-colors cursor-pointer">
+                  About Nam Radio Local
+                </a>
+              </li>
             </ul>
           </div>
         </div>
